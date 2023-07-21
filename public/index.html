@@ -146,10 +146,9 @@
         loadEl.textContent = 'Error loading the Firebase SDK, check the console.';
       }
 
-      firebase.auth().onAuthStateChanged(console.log)
       await firebase.auth().signInAnonymously();
       stage_id = (new URL(window.location.href)).hash.substring(1)
-      firebase.database().ref(`/data/${stage_id}/current`).on('value', console.log)
+      firebase.database().ref(`/data/${stage_id}/current`).on('value', snapshot => console.log(snapshot.val()))
     });
   </script>
 </body>
