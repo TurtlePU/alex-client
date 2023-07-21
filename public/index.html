@@ -33,6 +33,10 @@
       padding: 0;
     }
 
+    section {
+      flex: auto;
+    }
+
     #message {
       background: white;
       max-width: 360px;
@@ -100,14 +104,16 @@
 </head>
 
 <body>
-  <div id="message">
-    <h2>Welcome</h2>
-    <h1>Firebase Hosting Setup Complete</h1>
-    <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something
-      extraordinary!</p>
-    <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
+  <div id="content">
+    <div id="message">
+      <h2>Welcome</h2>
+      <h1>Firebase Hosting Setup Complete</h1>
+      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something
+        extraordinary!</p>
+      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
+    </div>
+    <p id="load">Firebase SDK Loading&hellip;</p>
   </div>
-  <p id="load">Firebase SDK Loading&hellip;</p>
 
   <script>
     document.addEventListener('DOMContentLoaded', async function () {
@@ -147,8 +153,23 @@
       }
 
       await firebase.auth().signInAnonymously();
-      stage_id = (new URL(window.location.href)).hash.substring(1)
-      firebase.database().ref(`/data/${stage_id}/current`).on('value', snapshot => console.log(snapshot.val()))
+      const stage_id = (new URL(window.location.href)).hash.substring(1)
+      firebase.database().ref(`/data/${stage_id}/current`).on('value', snapshot => {
+        const performance_id = Object.keys(snapshot.val())[0]
+        firebase.database().ref(`/data/${stage_id}/report/${performance_id}`).on('value', async snapshot => {
+          const { average, comments } = snapshot.val()
+          const jury = Object.keys(comments)
+          const urls = await Promise.all(jury.map(jury_name => firebase.storage().ref(`${jury_name}.png`).getDownloadURL()))
+          const articles = urls.map((url, i) => {
+            rating = comments[jury[i]]
+            return /*html*/`<article><img src="${url}"/><p>${rating}</p></article>`
+          })
+          document.querySelector('#content').innerHTML = /*html*/`
+            <p>Средний балл: ${average}</p>
+            <section>${articles.join()}</section>
+          `
+        })
+      })
     });
   </script>
 </body>
