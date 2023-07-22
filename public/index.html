@@ -159,6 +159,8 @@
         firebase.database().ref(`/data/${stage_id}/report/${performance_id}`).on('value', async snapshot => {
           const { average, comments } = snapshot.val()
           const jury = Object.keys(comments)
+          const ref = firebase.storage().ref(`${jury[0]}.png`)
+          console.log(ref.fullPath, ref.bucket)
           const urls = await Promise.all(jury.map(jury_name => firebase.storage().ref(`${jury_name}.png`).getDownloadURL()))
           const articles = urls.map((url, i) => {
             rating = comments[jury[i]]
