@@ -154,11 +154,17 @@
 
       await firebase.auth().signInAnonymously();
       const stage_id = (new URL(window.location.href)).hash.substring(1)
+      const content = document.querySelector('#content')
       firebase.database().ref(`/data/${stage_id}/current`).on('value', snapshot => {
-        const performance_id = Object.keys(snapshot.val())[0]
+        const val = snapshot.val()
+        if (!val) {
+          content.innerHTML = /*html*/`<p>Извините, ничего ещё не началось.</p>`
+          return
+        }
+        const performance_id = Object.keys(val)[0]
         firebase.database().ref(`/data/${stage_id}/report/${performance_id}`).on('value', async snapshot => {
           const val = snapshot.val()
-          if (val && val.comments) {
+          if (!!val && val.comments) {
             const { average, comments } = val
           } else {
             const [average, comments] = [NaN, {}]
@@ -171,7 +177,7 @@
             const { rating } = comments[jury[i]]
             return /*html*/`<article><img src="${url}"/><p>${rating}</p></article>`
           })
-          document.querySelector('#content').innerHTML = /*html*/`
+          content.innerHTML = /*html*/`
             <p>Средний балл: ${average}</p>
             <section>${articles.join()}</section>
           `
