@@ -133,9 +133,9 @@
       //
       // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
 
+      firebase.initializeApp({ storageBucket: 'gs://msys-22076.appspot.com' });
       try {
         const app = firebase.app();
-        app.initializeApp({ storageBucket: 'gs://msys-22076.appspot.com' });
         let features = [
           'auth',
           'database',
