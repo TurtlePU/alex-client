@@ -50,10 +50,10 @@
         const performance_id = Object.keys(val)[0];
         firebase.database().ref(`/data/${stage_id}/report/${performance_id}`).on('value', async snapshot => {
           const val = snapshot.val();
+          let [average, comments] = [NaN, {}];
           if (!!val && val.comments) {
-            const { average, comments } = val;
-          } else {
-            const [average, comments] = [NaN, {}];
+            average = val.average;
+            comments = val.comments;
           }
           const jury = Object.keys(comments);
           const urls = await Promise.all(jury.map(jury_name => {
