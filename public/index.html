@@ -68,7 +68,7 @@
           const val = snapshot.val();
           let [average, comments] = [NaN, {}];
           if (!!val && val.comments) {
-            average = val.average;
+            average = Number.parseFloat(val.average).toFixed(2);
             comments = val.comments;
           }
           const jury = Object.keys(comments);
