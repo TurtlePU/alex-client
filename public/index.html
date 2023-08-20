@@ -64,6 +64,8 @@
           return;
         }
         const performance_id = Object.keys(val)[0];
+        const { name } = val[performance_id];
+        content.innerHTML = /*html*/`<p>${name}</p>`
         firebase.database().ref(`/data/${stage_id}/report/${performance_id}`).on('value', async snapshot => {
           const val = snapshot.val();
           let [average, comments] = [NaN, {}];
@@ -79,10 +81,12 @@
             const { rating } = comments[jury[i]];
             return /*html*/`<article><img src="${url}"/><p>${rating}</p></article>`;
           });
-          content.innerHTML = /*html*/`
-            <p>Средний балл: ${average}</p>
-            <section>${articles.join('')}</section>
-          `;
+          if (jury.length) {
+            content.innerHTML = /*html*/`
+              <p>Средний балл: ${average}</p>
+              <section>${articles.join('')}</section>
+            `;
+          }
         });
       });
     });
