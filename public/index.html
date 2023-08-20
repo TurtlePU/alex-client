@@ -64,8 +64,11 @@
           return;
         }
         const performance_id = Object.keys(val)[0];
-        const { name } = val[performance_id];
-        content.innerHTML = /*html*/`<p>${name}</p>`
+        const { name, performance } = val[performance_id];
+        content.innerHTML = /*html*/`
+          <p>${performance_id}. ${name}</p>
+          <p>${performance}</p>
+        `;
         firebase.database().ref(`/data/${stage_id}/report/${performance_id}`).on('value', async snapshot => {
           const val = snapshot.val();
           let [average, comments] = [NaN, {}];
