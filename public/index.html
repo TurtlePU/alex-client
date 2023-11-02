@@ -57,39 +57,45 @@
       await firebase.auth().signInAnonymously();
       const stage_id = (new URL(window.location.href)).hash.substring(1);
       const content = document.querySelector('#content');
-      firebase.database().ref(`/data/${stage_id}/current`).on('value', snapshot => {
+      firebase.database().ref(`/data/${stage_id}/contacts`).on('value', snapshot => {
         const val = snapshot.val();
-        if (!val) {
-          content.innerHTML = /*html*/`<p>Извините, ничего ещё не началось.</p>`;
-          return;
-        }
-        const performance_id = Object.keys(val)[0];
-        const { name, performance } = val[performance_id];
-        content.innerHTML = /*html*/`
-          <p>Идёт конкурсное прослушивание</p>
-          <p>${performance_id}. ${name}</p>
-          <p>${performance}</p>
-        `;
-        firebase.database().ref(`/data/${stage_id}/report/${performance_id}`).on('value', async snapshot => {
+        const jury_count = Object.keys(val).length - 2;
+        firebase.database().ref(`/data/${stage_id}/current`).on('value', snapshot => {
           const val = snapshot.val();
-          let [average, comments] = [NaN, {}];
-          if (!!val && val.comments) {
-            average = Number.parseFloat(val.average).toFixed(2);
-            comments = val.comments;
+          if (!val) {
+            content.innerHTML = /*html*/`<p>Извините, ничего ещё не началось.</p>`;
+            return;
           }
-          const jury = Object.keys(comments);
-          const urls = await Promise.all(jury.map(jury_name => {
-            return firebase.storage().ref(`${jury_name.trim()}.png`).getDownloadURL();
-          }));
-          const articles = urls.map((url, i) => {
-            const { rating } = comments[jury[i]];
-            return /*html*/`<article><img src="${url}"/><p>${rating}</p></article>`;
-          });
-          if (jury.length) {
-            content.innerHTML = /*html*/`
-              <p>Средний балл: ${average}</p>
-              <section>${articles.join('')}</section>
-            `;
+          const performance_id = Object.keys(val)[0];
+          const { name, performance } = val[performance_id];
+          content.innerHTML = /*html*/`
+            <p>Идёт конкурсное прослушивание</p>
+            <p>${performance_id}. ${name}</p>
+            <p>${performance}</p>
+          `;
+          if (jury_count > 0) {
+            firebase.database().ref(`/data/${stage_id}/report/${performance_id}`).on('value', async snapshot => {
+              const val = snapshot.val();
+              let [average, comments] = [NaN, {}];
+              if (!!val && val.comments) {
+                average = Number.parseFloat(val.average).toFixed(2);
+                comments = val.comments;
+              }
+              const jury = Object.keys(comments);
+              if (jury.length == jury_count) {
+                const urls = await Promise.all(jury.map(jury_name => {
+                  return firebase.storage().ref(`${jury_name.trim()}.png`).getDownloadURL();
+                }));
+                const articles = urls.map((url, i) => {
+                  const { rating } = comments[jury[i]];
+                  return /*html*/`<article><img src="${url}"/><p>${rating}</p></article>`;
+                });
+                content.innerHTML = /*html*/`
+                  <p>Средний балл: ${average}</p>
+                  <section>${articles.join('')}</section>
+                `;
+              }
+            });
           }
         });
       });
