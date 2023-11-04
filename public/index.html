@@ -67,10 +67,9 @@
             return;
           }
           const performance_id = Object.keys(val)[0];
-          const { name, performance } = val[performance_id];
+          const { name, age, performance } = val[performance_id];
           content.innerHTML = /*html*/`
-            <p>Идёт конкурсное прослушивание</p>
-            <p>${performance_id}. ${name}</p>
+            <p>${performance_id}. ${name}, ${age}</p>
             <p>${performance}</p>
           `;
           if (jury_count > 0) {
