@@ -90,7 +90,7 @@
                   return /*html*/`<article><img src="${url}"/><p>${rating}</p></article>`;
                 });
                 content.innerHTML = /*html*/`
-                  <p>Средний балл: ${average}</p>
+                  <p>${performance_id}. ${name}: ${average}</p>
                   <section>${articles.join('')}</section>
                 `;
               }
