@@ -11,7 +11,6 @@
   <!-- include only the Firebase features as you need -->
   <script defer src="/__/firebase/9.18.0/firebase-auth-compat.js"></script>
   <script defer src="/__/firebase/9.18.0/firebase-database-compat.js"></script>
-  <script defer src="/__/firebase/9.18.0/firebase-storage-compat.js"></script>
   <!-- 
       initialize the SDK after all desired features are loaded, set useEmulator to false
       to avoid connecting the SDK to running emulators.
@@ -82,9 +81,7 @@
               }
               const jury = Object.keys(comments);
               if (jury.length == jury_count) {
-                const urls = await Promise.all(jury.map(jury_name => {
-                  return firebase.storage().ref(`${jury_name.trim()}.png`).getDownloadURL();
-                }));
+                const urls = jury.map(jury_name => `${jury_name.trim()}.jpg`);
                 const articles = urls.map((url, i) => {
                   const { rating } = comments[jury[i]];
                   return /*html*/`<article><img src="${url}"/><p>${rating}</p></article>`;
